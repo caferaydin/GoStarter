@@ -26,6 +26,14 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL
 );
+
+CREATE TABLE refresh_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    token TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL
+);
+
 ```
 
 ### 3. Modülleri Yükle
@@ -47,6 +55,7 @@ go run ./cmd/main.go
 | POST   | /register      | Yeni kullanıcı kaydı |
 | POST   | /login         | Giriş ve token alma  |
 | GET    | /api/profile   | Token ile erişilen profil |
+| POST   | /refresh-token | refresh-token        |
 
 ---
 
