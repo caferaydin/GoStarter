@@ -19,16 +19,16 @@ func main() {
 	defer db.Close()
 
 	userRepo := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
-	userHandler := handler.NewUserHandler(userService)
+	userService := service.NewUserService(userRepo, cfg)
+	userHandler := handler.NewUserHandler(userService, cfg.JWTSecret, cfg.RefreshSecret, cfg.AccessTokenExpiry, cfg.RefreshTokenExpiry)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/login", userHandler.Login).Methods("POST")
 	r.HandleFunc("/register", userHandler.Register).Methods("POST")
+	r.HandleFunc("/refresh-token", userHandler.RefreshToken).Methods("POST")
 
 	api := r.PathPrefix("/api").Subrouter()
-	api.Use(middleware.JWTAuthMiddleware)
-	api.HandleFunc("/profile", userHandler.Profile).Methods("GET")
+	api.Use(middleware.JWTAuthMiddleware([]byte(cfg.JWTSecret)))
 
 	log.Println("Server started at :8080")
 	http.ListenAndServe(":8080", r)
